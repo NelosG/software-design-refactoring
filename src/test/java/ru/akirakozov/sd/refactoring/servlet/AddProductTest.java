@@ -3,7 +3,7 @@ package ru.akirakozov.sd.refactoring.servlet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import ru.akirakozov.sd.refactoring.dao.impl.ProductDaoImpl;
+import ru.akirakozov.sd.refactoring.dao.ProductDao;
 import ru.akirakozov.sd.refactoring.entity.Product;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class AddProductTest extends AbstractTest {
     @Override
     void runSupport() {
         try {
-            new AddProductServlet(new ProductDaoImpl(database)).doGet(request, response);
+            new AddProductServlet(new ProductDao()).doGet(request, response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

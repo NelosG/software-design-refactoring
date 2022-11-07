@@ -22,7 +22,7 @@ public class AddProductServlet extends ApplicationServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getParameter("name");
         long price = Long.parseLong(request.getParameter("price"));
-        productDao.insert(new Product(name, price));
+        productDao.save(new Product(name, price));
 
         setupResponse(new AddProductView().render(), response);
     }

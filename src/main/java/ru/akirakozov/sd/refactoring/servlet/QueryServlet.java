@@ -26,18 +26,18 @@ public class QueryServlet extends ApplicationServlet {
 
         if ("max".equals(command)) {
             setupResponse(
-                    productDao.findWithMaxPrice().map(MaxQueryView::new).orElseGet(MaxQueryView::new).render(),
+                    productDao.findMax().map(MaxQueryView::new).orElseGet(MaxQueryView::new).render(),
                     response
             );
         } else if ("min".equals(command)) {
             setupResponse(
-                    productDao.findWithMinPrice().map(MinQueryView::new).orElseGet(MinQueryView::new).render(),
+                    productDao.findMin().map(MinQueryView::new).orElseGet(MinQueryView::new).render(),
                     response
             );
         } else if ("sum".equals(command)) {
-            setupResponse(new SumQueryView(productDao.findSumPrice()).render(), response);
+            setupResponse(new SumQueryView(productDao.findSum()).render(), response);
         } else if ("count".equals(command)) {
-            setupResponse(new CountQueryView(productDao.findCount()).render(), response);
+            setupResponse(new CountQueryView(productDao.count()).render(), response);
         } else {
             unknownCommand(command, response);
         }

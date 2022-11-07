@@ -1,57 +1,63 @@
-package ru.akirakozov.sd.refactoring.entity;
+package ru.akirakozov.sd.refactoring.entity
 
-import java.util.Objects;
+import java.util.*
+import javax.persistence.*
 
-public class Product {
-    private final Integer id;
-    private final String name;
-    private final long price;
+@Entity(name = "Product")
+@Table(name = Product.TABLE_NAME)
+class Product() {
 
-    public Product(Integer id, String name, long price) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
+    @Id
+    @SequenceGenerator(name = "seq_gen", sequenceName = "product_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "product_id_seq")
+    @Column(name = "id", nullable = false)
+    var id: Int? = null
+
+    @Column(name = "name", nullable = false)
+    private var name: String? = null
+
+    fun getName(): String {
+        return name ?: error("Name missing")
     }
 
-    public Product(String name, long price) {
-        this(null, name, price);
+
+    @Column(name = "price", nullable = false)
+    private var price: Long? = null
+
+    fun getPrice(): Long {
+        return price ?: error("Price missing")
     }
 
-    public int getId() {
-        return id;
+    constructor(name: String, price: Long) : this() {
+        this.name = name
+        this.price = price
     }
 
-    public String getName() {
-        return name;
+    constructor(id: Int, name: String, price: Long) : this(name, price) {
+        this.id = id
     }
 
-    public long getPrice() {
-        return price;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof Product) {
-            Product product = (Product) o;
-            return Objects.equals(id, product.id) &&
-                    price == product.price &&
-                    name.equals(product.name);
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other is Product) {
+            return id == other.id && price == other.price && name == other.name
         }
-        return false;
+        return false
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, price);
+    override fun hashCode(): Int {
+        return Objects.hash(id, name, price)
     }
 
-    @Override
-    public String toString() {
+    override fun toString(): String {
         return "Product {" +
                 "id=" + id +
                 ", name='" + name + "'" +
                 ", price=" + price +
-                '}';
+                '}'
+    }
+
+    companion object {
+        const val TABLE_NAME = "product"
     }
 }
