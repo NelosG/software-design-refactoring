@@ -3,6 +3,7 @@ package ru.akirakozov.sd.refactoring.servlet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import ru.akirakozov.sd.refactoring.entity.Product;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +18,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AddProductTest extends AbstractTest {
     private List<Product> callServletWithValidation(Product product) {
-        when(request.getParameter("name")).thenReturn(product.name);
-        when(request.getParameter("price")).thenReturn(String.valueOf(product.price));
+        when(request.getParameter("name")).thenReturn(product.getName());
+        when(request.getParameter("price")).thenReturn(String.valueOf(product.getPrice()));
         return callServletWithValidationAndGetItems();
     }
 

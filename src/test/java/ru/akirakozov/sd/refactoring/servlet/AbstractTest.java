@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mockito.Mock;
 import ru.akirakozov.sd.refactoring.dao.Database;
+import ru.akirakozov.sd.refactoring.entity.Product;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,7 +98,7 @@ public abstract class AbstractTest {
     }
 
     void addProduct(Product product) {
-        database.update(String.format("INSERT INTO PRODUCT(NAME, PRICE) VALUES ('%s', %d)", product.name, product.price));
+        database.update(String.format("INSERT INTO PRODUCT(NAME, PRICE) VALUES ('%s', %d)", product.getName(), product.getPrice()));
     }
 
 

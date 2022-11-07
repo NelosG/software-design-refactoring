@@ -3,6 +3,7 @@ package ru.akirakozov.sd.refactoring.servlet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import ru.akirakozov.sd.refactoring.entity.Product;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -128,15 +129,15 @@ public class QueryTest extends AbstractTest {
         private final List<Product> products = new ArrayList<>();
 
         private int getPriceSum() {
-            return products.stream().mapToInt(product -> product.price).sum();
+            return products.stream().mapToInt(Product::getPrice).sum();
         }
 
         private Product getMinPriceProduct() {
-            return products.stream().min(Comparator.comparing(product -> product.price)).orElse(null);
+            return products.stream().min(Comparator.comparing(Product::getPrice)).orElse(null);
         }
 
         private Product getMaxPriceProduct() {
-            return products.stream().max(Comparator.comparing(product -> product.price)).orElse(null);
+            return products.stream().max(Comparator.comparing(Product::getPrice)).orElse(null);
         }
 
 
