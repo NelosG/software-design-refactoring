@@ -1,80 +1,61 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import ru.akirakozov.sd.refactoring.dao.Database;
+import ru.akirakozov.sd.refactoring.dao.ProductDao;
+import ru.akirakozov.sd.refactoring.entity.Product;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Optional;
 
 /**
  * @author akirakozov
  */
 public class QueryServlet extends HttpServlet {
-    private final Database database;
+    private final ProductDao productDao;
 
-    public QueryServlet(Database database) {
-        this.database = database;
+    public QueryServlet(ProductDao productDao) {
+        this.productDao = productDao;
     }
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String command = request.getParameter("command");
-
-        if ("max".equals(command)) {
-            database.query("SELECT * FROM PRODUCT ORDER BY PRICE DESC LIMIT 1", resultSet -> {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("<h1>Product with max price: </h1>");
-
-                while (resultSet.next()) {
-                    String  name = resultSet.getString("name");
-                    int price  = resultSet.getInt("price");
-                    response.getWriter().println(name + "\t" + price + "</br>");
-                }
-                response.getWriter().println("</body></html>");
-                return null;
-            });
-        } else if ("min".equals(command)) {
-            database.query("SELECT * FROM PRODUCT ORDER BY PRICE LIMIT 1", resultSet -> {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("<h1>Product with min price: </h1>");
-
-                while (resultSet.next()) {
-                    String  name = resultSet.getString("name");
-                    int price  = resultSet.getInt("price");
-                    response.getWriter().println(name + "\t" + price + "</br>");
-                }
-                response.getWriter().println("</body></html>");
-                return null;
-            });
-        } else if ("sum".equals(command)) {
-            database.query("SELECT SUM(price) FROM PRODUCT", resultSet -> {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("Summary price: ");
-                if (resultSet.next()) {
-                    response.getWriter().println(resultSet.getInt(1));
-                }
-                response.getWriter().println("</body></html>");
-                return null;
-            });
-        } else if ("count".equals(command)) {
-            database.query("SELECT COUNT(*) FROM PRODUCT", resultSet -> {
-            response.getWriter().println("<html><body>");
-            response.getWriter().println("Number of products: ");
-            if (resultSet.next()) {
-                response.getWriter().println(resultSet.getInt(1));
-            }
-
-            response.getWriter().println("</body></html>");
-            return null;
-        });
-        } else {
-            response.getWriter().println("Unknown command: " + command);
+        
+        PrintWriter writer;
+        try {
+            writer = response.getWriter();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
 
+        writer.println("<html><body>");
+        if ("max".equals(command)) {
+            Optional<Product> optionalProduct = productDao.findWithMaxPrice();
+            writer.println("<h1>Product with max price: </h1>");
+            optionalProduct.ifPresent(product -> writer.println(product + "</br>"));
+        } else if ("min".equals(command)) { 
+            Optional<Product> optionalProduct = productDao.findWithMinPrice();
+            writer.println("<h1>Product with min price: </h1>");
+            optionalProduct.ifPresent(product -> writer.println(product + "</br>"));
+        } else if ("sum".equals(command)) {
+            writer.println("Summary price: ");
+            writer.println(productDao.findSumPrice());
+        } else if ("count".equals(command)) {
+            writer.println("Number of products: ");
+            writer.println(productDao.findCount());
+        } else {
+            writer.println("Unknown command: " + command);
+        }
+        writer.println("</body></html>");
         response.setContentType("text/html");
         response.setStatus(HttpServletResponse.SC_OK);
     }

@@ -3,6 +3,7 @@ package ru.akirakozov.sd.refactoring.servlet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import ru.akirakozov.sd.refactoring.dao.impl.ProductDaoImpl;
 import ru.akirakozov.sd.refactoring.entity.Product;
 
 import java.util.ArrayList;
@@ -88,10 +89,10 @@ public class QueryTest extends AbstractTest {
         assertEquals("Summary price: " + testData.getPriceSum(), result);
 
         result = callServletWithValidationAndGetResult("min");
-        assertEquals("<h1>Product with min price: </h1>" + testData.getMinPriceProduct() + "</br>", result);
+        assertEquals("<h1>Product with min price: </h1>" + testData.getMinPriceProduct().toString() + "</br>", result);
 
         result = callServletWithValidationAndGetResult("max");
-        assertEquals("<h1>Product with max price: </h1>" + testData.getMaxPriceProduct() + "</br>", result);
+        assertEquals("<h1>Product with max price: </h1>" + testData.getMaxPriceProduct().toString() + "</br>", result);
     }
 
     @Test
@@ -114,7 +115,7 @@ public class QueryTest extends AbstractTest {
     @Override
     void runSupport() {
         try {
-            new QueryServlet(database).doGet(request, response);
+            new QueryServlet(new ProductDaoImpl(database)).doGet(request, response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -128,8 +129,8 @@ public class QueryTest extends AbstractTest {
     private static class TestData {
         private final List<Product> products = new ArrayList<>();
 
-        private int getPriceSum() {
-            return products.stream().mapToInt(Product::getPrice).sum();
+        private long getPriceSum() {
+            return products.stream().mapToLong(Product::getPrice).sum();
         }
 
         private Product getMinPriceProduct() {

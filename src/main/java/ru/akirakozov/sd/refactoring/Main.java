@@ -4,6 +4,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import ru.akirakozov.sd.refactoring.dao.Database;
+import ru.akirakozov.sd.refactoring.dao.ProductDao;
+import ru.akirakozov.sd.refactoring.dao.impl.ProductDaoImpl;
 import ru.akirakozov.sd.refactoring.servlet.AddProductServlet;
 import ru.akirakozov.sd.refactoring.servlet.GetProductsServlet;
 import ru.akirakozov.sd.refactoring.servlet.QueryServlet;
@@ -37,9 +39,10 @@ public class Main {
         context.setContextPath("/");
         server.setHandler(context);
 
-        context.addServlet(new ServletHolder(new AddProductServlet(database)), "/add-product");
-        context.addServlet(new ServletHolder(new GetProductsServlet(database)),"/get-products");
-        context.addServlet(new ServletHolder(new QueryServlet(database)),"/query");
+        ProductDao productDao = new ProductDaoImpl(database);
+        context.addServlet(new ServletHolder(new AddProductServlet(productDao)), "/add-product");
+        context.addServlet(new ServletHolder(new GetProductsServlet(productDao)),"/get-products");
+        context.addServlet(new ServletHolder(new QueryServlet(productDao)),"/query");
 
         server.start();
         server.join();
