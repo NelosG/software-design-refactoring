@@ -1,5 +1,7 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
+import ru.akirakozov.sd.refactoring.dao.Database;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,33 +15,25 @@ import java.sql.Statement;
  * @author akirakozov
  */
 public class GetProductsServlet extends HttpServlet {
-    private final String dbConnectionUrl;
+    private final Database database;
 
-    public GetProductsServlet(String dbConnectionUrl) {
-        this.dbConnectionUrl = dbConnectionUrl;
+    public GetProductsServlet(Database database) {
+        this.database = database;
     }
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            try (Connection c = DriverManager.getConnection(dbConnectionUrl)) {
-                Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
-                response.getWriter().println("<html><body>");
+        database.query("SELECT * FROM PRODUCT", resultSet -> {
+                    response.getWriter().println("<html><body>");
 
-                while (rs.next()) {
-                    String  name = rs.getString("name");
-                    int price  = rs.getInt("price");
-                    response.getWriter().println(name + "\t" + price + "</br>");
-                }
-                response.getWriter().println("</body></html>");
-
-                rs.close();
-                stmt.close();
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+                    while (resultSet.next()) {
+                        String name = resultSet.getString("name");
+                        int price = resultSet.getInt("price");
+                        response.getWriter().println(name + "\t" + price + "</br>");
+                    }
+                    response.getWriter().println("</body></html>");
+                    return null;
+                });
 
         response.setContentType("text/html");
         response.setStatus(HttpServletResponse.SC_OK);

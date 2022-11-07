@@ -19,7 +19,7 @@ public class GetProductTest extends AbstractTest {
     @Override
     void runSupport() {
         try {
-            new GetProductsServlet(dbUrl).doGet(request, response);
+            new GetProductsServlet(database).doGet(request, response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -113,7 +113,7 @@ public class QueryTest extends AbstractTest {
     @Override
     void runSupport() {
         try {
-            new QueryServlet(dbUrl).doGet(request, response);
+            new QueryServlet(database).doGet(request, response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

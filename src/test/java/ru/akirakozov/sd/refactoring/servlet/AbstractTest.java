@@ -4,6 +4,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mockito.Mock;
+import ru.akirakozov.sd.refactoring.dao.Database;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 public abstract class AbstractTest {
-    protected static String dbUrl;
+    protected static Database database;
     protected static Path directory;
 
     @Mock
@@ -50,7 +51,7 @@ public abstract class AbstractTest {
             throw new UncheckedIOException(e);
         }
 
-        dbUrl = "jdbc:sqlite:" + directory.resolve("tmp.db");
+        database = new Database("jdbc:sqlite:" + directory.resolve("tmp.db"));
     }
 
     @AfterClass
@@ -75,44 +76,28 @@ public abstract class AbstractTest {
     }
 
     protected List<Product> executeSelectAll() {
-        try (Connection c = DriverManager.getConnection(dbUrl)) {
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
+        return database.query("SELECT * FROM PRODUCT", resultSet -> {
             List<Product> result = new ArrayList<>();
-            while (rs.next()) {
-                String  name = rs.getString("name");
-                int price  = rs.getInt("price");
+            while (resultSet.next()) {
+                String  name = resultSet.getString("name");
+                int price  = resultSet.getInt("price");
                 result.add(new Product(name, price));
             }
-            rs.close();
-            stmt.close();
             return result;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected void executeUpdate(String sql) {
-        try (Connection connection = DriverManager.getConnection(dbUrl)) {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     @Before
     public void initTestDb() {
-        executeUpdate("DROP TABLE IF EXISTS PRODUCT");
-        executeUpdate("CREATE TABLE PRODUCT" +
+        database.update("DROP TABLE IF EXISTS PRODUCT");
+        database.update("CREATE TABLE PRODUCT" +
                 "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                 " NAME           TEXT    NOT NULL, " +
                 " PRICE          INT     NOT NULL)");
     }
 
     void addProduct(Product product) {
-        executeUpdate(String.format("INSERT INTO PRODUCT(NAME, PRICE) VALUES ('%s', %d)", product.name, product.price));
+        database.update(String.format("INSERT INTO PRODUCT(NAME, PRICE) VALUES ('%s', %d)", product.name, product.price));
     }
 
 

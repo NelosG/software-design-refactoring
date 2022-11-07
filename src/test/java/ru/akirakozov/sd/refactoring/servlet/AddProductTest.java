@@ -25,7 +25,7 @@ public class AddProductTest extends AbstractTest {
     @Override
     void runSupport() {
         try {
-            new AddProductServlet(dbUrl).doGet(request, response);
+            new AddProductServlet(database).doGet(request, response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
