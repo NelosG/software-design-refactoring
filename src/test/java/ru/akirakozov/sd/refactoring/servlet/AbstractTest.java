@@ -18,11 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -80,8 +75,8 @@ public abstract class AbstractTest {
         return database.query("SELECT * FROM PRODUCT", resultSet -> {
             List<Product> result = new ArrayList<>();
             while (resultSet.next()) {
-                String  name = resultSet.getString("name");
-                int price  = resultSet.getInt("price");
+                String name = resultSet.getString("name");
+                int price = resultSet.getInt("price");
                 result.add(new Product(name, price));
             }
             return result;
@@ -134,6 +129,7 @@ public abstract class AbstractTest {
         assertTrue(statusSet[0]);
         return stringWriter.getBuffer().toString().trim();
     }
+
     List<Product> callServletWithValidationAndGetItems() {
         return getProductsFromResponce(callServletWithValidationAndGetResponce());
     }

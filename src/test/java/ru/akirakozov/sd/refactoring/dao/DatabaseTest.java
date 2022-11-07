@@ -1,6 +1,8 @@
 package ru.akirakozov.sd.refactoring.dao;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -11,7 +13,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DatabaseTest {
     private Path tempDir;
@@ -64,7 +66,7 @@ public class DatabaseTest {
                 " price          INT     NOT NULL)");
     }
 
-    @Test 
+    @Test
     public void testDdl() {
         Database database = new Database(testDbUrl);
         initTestTable(database);

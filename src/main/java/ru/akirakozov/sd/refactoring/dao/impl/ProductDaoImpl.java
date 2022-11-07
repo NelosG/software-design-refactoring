@@ -13,9 +13,8 @@ import java.util.Optional;
 
 public class ProductDaoImpl implements ProductDao {
     private static final String TABLE_NAME = "PRODUCT";
-
-    private boolean tableExists = false;
     private final Database database;
+    private boolean tableExists = false;
 
     public ProductDaoImpl(Database database) {
         this.database = database;
@@ -90,8 +89,8 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     private Product internalMapToProduct(ResultSet resultSet) throws SQLException {
-        String  name = resultSet.getString("name");
-        int price  = resultSet.getInt("price");
+        String name = resultSet.getString("name");
+        int price = resultSet.getInt("price");
         return new Product(name, price);
     }
 

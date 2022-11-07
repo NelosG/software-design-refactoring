@@ -1,6 +1,10 @@
 package ru.akirakozov.sd.refactoring.dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Database {
     private final String connectionUrl;
@@ -13,7 +17,7 @@ public class Database {
         try (
                 Connection connection = DriverManager.getConnection(connectionUrl);
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql);
+                ResultSet resultSet = statement.executeQuery(sql)
         ) {
             return mapper.apply(resultSet);
         } catch (Exception e) {
@@ -24,7 +28,7 @@ public class Database {
     public int update(String sql) {
         try (
                 Connection connection = DriverManager.getConnection(connectionUrl);
-                Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement()
         ) {
             return statement.executeUpdate(sql);
         } catch (SQLException e) {

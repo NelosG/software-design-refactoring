@@ -1,63 +1,46 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
-import ru.akirakozov.sd.refactoring.dao.Database;
 import ru.akirakozov.sd.refactoring.dao.ProductDao;
-import ru.akirakozov.sd.refactoring.entity.Product;
+import ru.akirakozov.sd.refactoring.view.CountQueryView;
+import ru.akirakozov.sd.refactoring.view.MaxQueryView;
+import ru.akirakozov.sd.refactoring.view.MinQueryView;
+import ru.akirakozov.sd.refactoring.view.SumQueryView;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UncheckedIOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Optional;
 
 /**
  * @author akirakozov
  */
-public class QueryServlet extends HttpServlet {
+public class QueryServlet extends ApplicationServlet {
     private final ProductDao productDao;
 
     public QueryServlet(ProductDao productDao) {
         this.productDao = productDao;
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String command = request.getParameter("command");
-        
-        PrintWriter writer;
-        try {
-            writer = response.getWriter();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
 
-        writer.println("<html><body>");
         if ("max".equals(command)) {
-            Optional<Product> optionalProduct = productDao.findWithMaxPrice();
-            writer.println("<h1>Product with max price: </h1>");
-            optionalProduct.ifPresent(product -> writer.println(product + "</br>"));
-        } else if ("min".equals(command)) { 
-            Optional<Product> optionalProduct = productDao.findWithMinPrice();
-            writer.println("<h1>Product with min price: </h1>");
-            optionalProduct.ifPresent(product -> writer.println(product + "</br>"));
+            setupResponse(
+                    productDao.findWithMaxPrice().map(MaxQueryView::new).orElseGet(MaxQueryView::new).render(),
+                    response
+            );
+        } else if ("min".equals(command)) {
+            setupResponse(
+                    productDao.findWithMinPrice().map(MinQueryView::new).orElseGet(MinQueryView::new).render(),
+                    response
+            );
         } else if ("sum".equals(command)) {
-            writer.println("Summary price: ");
-            writer.println(productDao.findSumPrice());
+            setupResponse(new SumQueryView(productDao.findSumPrice()).render(), response);
         } else if ("count".equals(command)) {
-            writer.println("Number of products: ");
-            writer.println(productDao.findCount());
+            setupResponse(new CountQueryView(productDao.findCount()).render(), response);
         } else {
-            writer.println("Unknown command: " + command);
+            unknownCommand(command, response);
         }
-        writer.println("</body></html>");
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
 }
