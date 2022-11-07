@@ -4,11 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,26 +31,8 @@ public class AddProductTest extends AbstractTest {
         }
     }
 
-    private List<Product> executeSelectAll() {
-        try (Connection c = DriverManager.getConnection(dbUrl)) {
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
-            List<Product> result = new ArrayList<>();
-            while (rs.next()) {
-                String name = rs.getString("name");
-                int price = rs.getInt("price");
-                result.add(new Product(name, price));
-            }
-            rs.close();
-            stmt.close();
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
-    List<Product> getProducts(String htmlResponse) {
+    List<Product> getProductsFromResponce(String htmlResponse) {
         assertEquals("OK", htmlResponse);
         return executeSelectAll();
     }
@@ -85,7 +62,7 @@ public class AddProductTest extends AbstractTest {
     }
 
     @Test
-    public void stress() {
+    public void randomTest() {
         Set<Product> products = new HashSet<>();
 
         for (int i = 0; i < 100; i++)

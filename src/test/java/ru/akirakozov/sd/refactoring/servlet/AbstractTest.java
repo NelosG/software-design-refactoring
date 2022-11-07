@@ -18,8 +18,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,6 +74,24 @@ public abstract class AbstractTest {
         }
     }
 
+    protected List<Product> executeSelectAll() {
+        try (Connection c = DriverManager.getConnection(dbUrl)) {
+            Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
+            List<Product> result = new ArrayList<>();
+            while (rs.next()) {
+                String  name = rs.getString("name");
+                int price  = rs.getInt("price");
+                result.add(new Product(name, price));
+            }
+            rs.close();
+            stmt.close();
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected void executeUpdate(String sql) {
         try (Connection connection = DriverManager.getConnection(dbUrl)) {
             Statement statement = connection.createStatement();
@@ -96,7 +116,7 @@ public abstract class AbstractTest {
     }
 
 
-    protected List<Product> callServletWithValidationAndGetItems() {
+    protected String callServletWithValidationAndGetResponce() {
         boolean[] contentTypeSet = new boolean[]{false};
         boolean[] statusSet = new boolean[]{false};
 
@@ -126,10 +146,13 @@ public abstract class AbstractTest {
 
         assertTrue(contentTypeSet[0]);
         assertTrue(statusSet[0]);
-        return getProducts(stringWriter.getBuffer().toString().trim());
+        return stringWriter.getBuffer().toString().trim();
+    }
+    List<Product> callServletWithValidationAndGetItems() {
+        return getProductsFromResponce(callServletWithValidationAndGetResponce());
     }
 
     abstract void runSupport();
 
-    abstract List<Product> getProducts(String htmlResponse);
+    abstract List<Product> getProductsFromResponce(String htmlResponse);
 }

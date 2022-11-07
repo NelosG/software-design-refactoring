@@ -25,7 +25,7 @@ public class GetProductTest extends AbstractTest {
         }
     }
 
-    List<Product> getProducts(String htmlResponse) {
+    List<Product> getProductsFromResponce(String htmlResponse) {
         htmlResponse = htmlResponse.replaceAll("(\r)?\n", "");
 
         assertTrue(htmlResponse.startsWith("<html>"));
